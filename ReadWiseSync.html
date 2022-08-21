@@ -2,31 +2,132 @@
 <html>
 
 <head>
-    <!--Localtestfile:file:///E:/nextcloud/wgshared/WG-Accounts.md-->
-    <!--Externaltestfile:file:///mnt/us/documents/My Clippings.txt-->
     <!-- Charactor set allowed to use -->
     <meta charset="utf-8" />
 
-    <title>Text from .txt file to TextArea</title>
+    
 
-    <!-- External stylesheet -->
-    <link rel="stylesheet" href="main.css" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     </script>
+    <style>
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            width: 100vw;
+        }
+        .pill {
+            display: flex;
+            flex-direction: row;
+            width: 40vw;
+            height: 60;
+            background-color: grey;
+            border-radius: 10px;
+            padding: 1em;
+            align-items: center;
+            margin: 2em;
+        }
+        .pill .label {
+            flex: 1;
+            text-align: center;
+            font-size: 1.5em;
+            vertical-align: middle;
+            line-height: 100%;               
+            color: white;
+        }
+
+        .pill .success {
+            text-align: center;
+            align-self: center;
+            vertical-align: top;
+            display: none;
+            border: 10px solid #f3f3f300;
+            border-radius: 50%;
+            
+            width: 40px;
+            height: 40px;
+            font-size: 40px;
+            background-color: #00ff00;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .pill.success .success {
+            display: block;
+        }
+        .pill.success .loader {
+            display: none;
+        }
+
+        .pill .loader {
+            border: 10px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 10px solid #3498db;
+            width: 40px;
+            height: 40px;
+            -webkit-animation: spin 2s linear infinite;
+            /* Safari */
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+    </style>
 
 </head>
 
 <body>
+    <!--3 Progress Pills for Loading Processing and Sending of Data -->
+    <div class="pill" id="ClippingsLoad">
+        <div class="loader"></div>
+        <div class="success">✓</div>
+        <div class="label">Loading Highlights</div>
+    </div>
+    <div class="pill" id="ClippingsProcess">
+        <div class="loader"></div>
+        <div class="success">✓</div>
+        <div class="label">Processing Highlights</div>
+    </div>
+    <div class="pill success" id="ClippingsUpload">
+        <div class="loader"></div>
+        <div class="success">✓</div>
+        <div class="label">Uploading Highlights</div>
+    </div>
 
 
-    <textarea name="" id="textarea" cols="30" rows="10"></textarea>
+    
     <script>
-        //file = "file:///mnt/us/documents/My Clippings.txt";
-        file = "https://gist.githubusercontent.com/thewheat/bb67f632950c7feaf4b8a2f3febbd98a/raw/02feb16f6fac5edf8e6df7e287dbb08b53cc38c1/Test.txt";
+        // get content of local clippings.txt file
+        //clippings_file = "file:///mnt/us/documents/My Clippings.txt";
+        clippings_file = "https://gist.githubusercontent.com/thewheat/bb67f632950c7feaf4b8a2f3febbd98a/raw/02feb16f6fac5edf8e6df7e287dbb08b53cc38c1/Test.txt";
+        clippings_text = readTextFile(clippings_file)
+        // TODO communicate to ui and transform to JSON
+        clippings_json = transformToJSON(clippings_text);
 
-        res = readTextFile(file)
-        // fill textarea with res
-        document.getElementById("textarea").value = res
-        sendEmailToReadwise(res)
+
+
+        // get accesstoken for readwise from the local file
+        access_toke_file = "file:///mnt/us/documents/access_token.txt";
+        access_toke_file =  'file:///E:/Documents/Projects/KindleWirelessReadwiseSync/AccessToken' //local access token file
+        access_token = readTextFile(access_toke_file);
+
+        // sent JSON to ReadWise
+        $.ajax({
+            url: 'https://readwise.io/api/v2/highlights/',
+            type: 'POST',
+            contentType: 'application/json',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Authorization', access_token);
+            },
+            data: JSON.stringify(clippings_json),
+            success: function (result) { console.log(result) },
+            error: function (error) { console.error(error) },
+        });
+
 
 
 
@@ -42,7 +143,7 @@
                         var len = allText.length || 0;
                         res = allText
 
-                        alert(allText)
+                        console.log(all_text)
                         return allText;
                     }
                 }
@@ -50,27 +151,10 @@
             rawFile.send(null);
             return res
         }
-function sendEmailToReadwise(text){
-    var targetadress = 'n.fuecker@smartinmedia.com'
-    Email.send({
-    Host : "smtp.elasticemail.com",
-    Username : "n.fuecker@rwth-aachen.de",
-    Password : '9F68CD50FE06187AE377DBDB808FE8D39F66',
-    To : targetadress,
-    From : "ganomee88@gmail.com",
-    Subject : "Clippings",
-    Body : "Directly send from kindle",
-    Attachments : [
-	{
-		name : "clippings.txt",
-        data: btoa(text)
-		
-	}]
-}).then(
-  message => alert(message)
-);
-}
-
+        function transformToJSON(text) {
+            // TODO insert email parser here
+            return text
+        }
     </script>
 
 
