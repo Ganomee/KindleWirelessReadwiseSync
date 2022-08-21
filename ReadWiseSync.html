@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--Localtestfile:file:///E:/nextcloud/wgshared/WG-Accounts.md-->
+    <!--Externaltestfile:file:///mnt/us/documents/My Clippings.txt-->
+    <!-- Charactor set allowed to use -->
+    <meta charset="utf-8" />
+
+    <title>Text from .txt file to TextArea</title>
+
+    <!-- External stylesheet -->
+    <link rel="stylesheet" href="main.css" />
+    </script>
+
+</head>
+
+<body>
+
+
+    <textarea name="" id="textarea" cols="30" rows="10"></textarea>
+    <script>
+        //file = "file:///mnt/us/documents/My Clippings.txt";
+        file = "https://gist.githubusercontent.com/thewheat/bb67f632950c7feaf4b8a2f3febbd98a/raw/02feb16f6fac5edf8e6df7e287dbb08b53cc38c1/Test.txt";
+
+        res = readTextFile(file)
+        // fill textarea with res
+        document.getElementById("textarea").value = res
+        sendEmailToReadwise(res)
+
+
+
+        function readTextFile(file) {
+            var rawFile = new XMLHttpRequest();
+            var res = null
+            rawFile.open("GET", file, false);
+            rawFile.onreadystatechange = function () {
+                if (rawFile.readyState === 4) {
+                    if (rawFile.status === 200 || rawFile.status == 0) {
+                        var allText = rawFile.responseText;
+                        // get length of text string
+                        var len = allText.length || 0;
+                        res = allText
+
+                        alert(allText)
+                        return allText;
+                    }
+                }
+            }
+            rawFile.send(null);
+            return res
+        }
+function sendEmailToReadwise(text){
+    var targetadress = 'n.fuecker@smartinmedia.com'
+    Email.send({
+    Host : "smtp.elasticemail.com",
+    Username : "n.fuecker@rwth-aachen.de",
+    Password : '9F68CD50FE06187AE377DBDB808FE8D39F66',
+    To : targetadress,
+    From : "ganomee88@gmail.com",
+    Subject : "Clippings",
+    Body : "Directly send from kindle",
+    Attachments : [
+	{
+		name : "clippings.txt",
+        data: btoa(text)
+		
+	}]
+}).then(
+  message => alert(message)
+);
+}
+
+    </script>
+
+
+</body>
+
+</html>
