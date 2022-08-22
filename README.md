@@ -15,4 +15,5 @@ file:///mnt/us/documents/ReadWiseSync.html
 
 ## Why does this work
 0.5) the kindle (experimental) browser allows you to navigate and view any displayable file on the system using direct links, thus enabling you to run js from local files by opening local html files.
+
 1.) The kindle browser uses a weird browser implementation, that has misconfigured cors policy that allows reading file contents of other local files given an XHTML request. This way we can pipe it into js, and sent it to (any) server.
